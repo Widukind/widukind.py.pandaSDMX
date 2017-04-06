@@ -1,7 +1,14 @@
-PandaSDMX for Widukind
-======================
+DB.nomics connector for Python using pandaSDMX
+==============================================
 
-**For a more complete documentation, refer to the original documentation:** http://pandasdmx.readthedocs.org/ 
+
+This package gives the possibility of downloading DB.nomics series in Python using pandaSDMX.
+
+**`DB.nomics <https://db.nomics.world/>`_ is a database of international macroeconomic data collected on public web servers of statistical offices worldwide.**
+
+*Please ask your questions to the `DB.nomics forum <https://forum.db.nomics.world/>`_.*
+
+**For a more complete documentation, refer to the original documentation:** http://pandasdmx.readthedocs.org/
 
 Installation
 ------------
@@ -9,8 +16,9 @@ Installation
 ::
 
     $ pip install https://github.com/dr-leo/pandasdmx/tarball/master
-    
-    $ pip install https://github.com/Widukind/widukind.py.pandaSDMX/tarball/master
+
+    $ pip install git+https://git.nomics.world/dbnomics/dbnomics-connector-pandasdmx.py.git
+
 
 Basic Example
 -------------
@@ -18,19 +26,19 @@ Basic Example
 ::
 
     >>> from widukind_sdmx import Request
-    
-    # Widukind Agencies: ECB, INSEE, EUROSTAT, BIS, IMF, OECD, ESRI, FED
+
+    # DB.nomics Agencies: ECB, INSEE, EUROSTAT, BIS, IMF, OECD, ESRI, FED
     >>> sdmx = Request(agency='INSEE')
-    
+
     >>> data_response = sdmx.get(resource_type='data', resource_id="IPCH-2015-FR-COICOP", key={'FREQ': 'A', 'PRODUIT': '00', 'NATURE': 'INDICE'})
 
     # Render to pandas.core.frame.DataFrame
-    
-    >>> cur_df = data_response.write()    
-    
+
+    >>> cur_df = data_response.write()
+
     >>> cur_df.shape
     (20, 1)
-    
+
     >>> cur_df.tail()
     NATURE       INDICE
     FREQ              A
@@ -40,13 +48,13 @@ Basic Example
     2012          98.33
     2013          99.31
     2014          99.91
-    2015         100.00    
+    2015         100.00
 
     # Render to Python
 
     >>> from pprint import pprint
-        
-    >>> data = list(data_response.msg.data.series)    
+
+    >>> data = list(data_response.msg.data.series)
     >>> obs = list(data[0].obs())
     >>> for o in obs: print(o.dim, o.value)
     ...
@@ -69,11 +77,11 @@ Basic Example
     2012 98.33
     2013 99.31
     2014 99.91
-    2015 100    
-    
+    2015 100
+
     >>> pprint(dict(data[0].key._asdict()))
     {'FREQ': 'A', 'NATURE': 'INDICE', 'PRODUIT': '00'}
-    
+
     >>> pprint(dict(data[0].attrib._asdict()))
     {'BASE-PER': '2015',
      'DECIMALS': '2',
@@ -85,7 +93,7 @@ Basic Example
      'UNIT-MEASURE': 'SO',
      'UNIT-MULT': '0',
      'WIDUKIND_ID': '001762489',
-     'WIDUKIND_NAME': 'Annual - 00 - All items - Index'}        
+     'WIDUKIND_NAME': 'Annual - 00 - All items - Index'}
 
 Structure
 ---------
@@ -94,20 +102,20 @@ Structure
 
     >>> from collections import OrderedDict
     >>> from widukind_sdmx import Request
-    
+
     >>> sdmx = Request(agency='INSEE')
 
     >>> dataflows_response = sdmx.get(resource_type='dataflow')
     >>> dataflows = dataflows_response.msg.dataflows
-    
+
     >>> datastructure_response = sdmx.get(resource_type='datastructure', resource_id="IPCH-2015-FR-COICOP")
     >>> dsd = datastructure_response.msg.datastructures["IPCH-2015-FR-COICOP"]
     >>> dimensions = OrderedDict([(dim.id, dim) for dim in dsd.dimensions.aslist() if dim.id not in ['TIME_PERIOD']])
-    
+
 Debug
 -----
 
-::    
+::
 
     >>> from widukind_sdmx import Request
     >>> sdmx = Request(agency='INSEE')
@@ -115,8 +123,8 @@ Debug
     >>> dataflows_response = sdmx.get(resource_type='dataflow')
 
     >>> print(dataflows_response.url)
-    http://widukind-api.cepremap.org/api/v1/sdmx/dataflow/INSEE
-    
+    https://db.nomics.world/api/v1/sdmx/dataflow/INSEE
+
     >>> print(dataflows_response.status_code)
     200
 
@@ -125,9 +133,9 @@ Config (optional)
 
 ::
 
-    # Widukind Production (default)
-    $ export WIDUKIND_API_URL=http://widukind-api.cepremap.org/api/v1/sdmx
-    
-    # Widukind local
+    # DB.nomics Production (default)
+    $ export WIDUKIND_API_URL=https://api.db.nomics.world/api/v1/sdmx
+
+    # DB.nomics local
     $ export WIDUKIND_API_URL=http://127.0.0.1:8081/api/v1/sdmx
-    
+
